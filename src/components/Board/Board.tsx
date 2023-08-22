@@ -5,12 +5,21 @@ import getWinner from "../../utils/getWinner";
 
 type TTurn = "X" | "O";
 
-const Board = (): JSX.Element => {
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [currentTurnSign, setCurrentTurnSign] = useState<TTurn>("X");
-  const [gameStatus, setGameStatus] = useState("");
+interface IBoardProps {
+  squares: Array<null>;
+  onTurn: (squares: Array<null | string>) => void;
+  winner: string | null;
+  gameStatus: string;
+}
 
-  const winner = getWinner(squares);
+const Board = ({
+  squares,
+  onTurn,
+  winner,
+  gameStatus,
+}: IBoardProps): JSX.Element => {
+  const [currentTurnSign, setCurrentTurnSign] = useState<TTurn>("X");
+
   const nextTurnSign = currentTurnSign === "X" ? "O" : "X";
 
   const handleSquareClick = useCallback(
@@ -20,25 +29,22 @@ const Board = (): JSX.Element => {
           return;
         }
 
-        setSquares((state) =>
-          state.map((square, index) => (index === i ? currentTurnSign : square))
-        );
-
         setCurrentTurnSign(nextTurnSign);
+        onTurn(
+          squares.map((square, index) =>
+            index === i ? currentTurnSign : square
+          )
+        );
       };
     },
     [currentTurnSign, squares, nextTurnSign]
   );
 
-  useEffect(() => {
-    setGameStatus(
-      winner ? `Winner: ${winner}` : `Next player: ${nextTurnSign}`
-    );
-  }, [winner, nextTurnSign]);
-
   return (
     <div className="board">
-      <div className="status">{gameStatus}</div>
+      <div className="status">
+        {gameStatus || `Next player: ${nextTurnSign}`}
+      </div>
       <div className="board-row">
         {squares.slice(0, 3).map((square, index) => (
           <Square onClick={handleSquareClick(index)} value={square} />
