@@ -6,28 +6,35 @@ import getWinner from "../../utils/getWinner";
 const Game = (): JSX.Element => {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [gameStatus, setGameStatus] = useState("");
+  const [currentMove, setCurrentMove] = useState(0);
+  const isNextMoveX = currentMove % 2 === 0;
 
-  const currentSquares = history[history.length - 1];
+  const currentSquares = history[currentMove];
   const winner = getWinner(currentSquares);
+  console.log("winner:", winner);
 
-  const handleJumpToTurn = useCallback((move: number) => {}, []);
+  const handleJumpToTurn = useCallback((move: number) => {
+    setCurrentMove(move);
+  }, []);
 
   const handleTurn = useCallback(
     (nextSquares: Array<null | string>) => {
-      setHistory([...history, nextSquares]);
+      const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+      setHistory(nextHistory);
+      setCurrentMove(nextHistory.length - 1);
     },
-    [history]
+    [history, currentMove]
   );
 
   useEffect(() => {
-    setGameStatus(winner ? `Winner: ${winner}` : "");
+    setGameStatus(winner ? `Winner: ${winner.squareSign}` : "");
   }, [winner]);
 
   const renderMoves = history.map((_, move) => {
     const description = move > 0 ? `Go to move #${move}` : "Go to game start";
 
     return (
-      <li>
+      <li key={move}>
         <button onClick={() => handleJumpToTurn(move)}>{description}</button>
       </li>
     );
@@ -41,6 +48,7 @@ const Game = (): JSX.Element => {
           onTurn={handleTurn}
           winner={winner}
           gameStatus={gameStatus}
+          isNextMoveX={isNextMoveX}
         />
       </div>
       <div className="game-info">

@@ -1,3 +1,9 @@
+export interface IResult {
+  squareSign: string;
+  isGameOver: boolean;
+  coords: number[];
+}
+
 const getWinner = (squares: Array<string | null>) => {
   const lines = [
     [0, 1, 2],
@@ -10,19 +16,25 @@ const getWinner = (squares: Array<string | null>) => {
     [2, 4, 6],
   ];
 
-  let result: undefined | string;
+  const result: IResult = {
+    coords: [],
+    isGameOver: false,
+    squareSign: "",
+  };
 
   lines.forEach((line) => {
     const [a, b, c] = line;
 
-    if (result) return;
+    if (result.isGameOver) return;
 
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      result = squares[a]!;
+      result.squareSign = squares[a]!;
+      result.isGameOver = true;
+      result.coords.push(...line);
     }
   });
 
-  return result || null;
+  return result.isGameOver ? result : null;
 };
 
 export default getWinner;

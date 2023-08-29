@@ -1,11 +1,19 @@
 interface ISquareProps {
   value: string | null;
   onClick: VoidFunction;
+  isHighlighted: boolean;
 }
 
-const Square = ({ value, onClick }: ISquareProps): JSX.Element => {
+const Square = ({
+  value,
+  onClick,
+  isHighlighted,
+}: ISquareProps): JSX.Element => {
   return (
-    <button className="square" onClick={onClick}>
+    <button
+      className={`square ${isHighlighted ? "squareHighlighted" : ""}`}
+      onClick={onClick}
+    >
       {value}
     </button>
   );
